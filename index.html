@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dejota</title>
+<link rel="icon" type="image/png" href="img/dejota_logo.png">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#070708] text-white antialiased">
+<nav class="fixed top-0 w-full z-40 flex justify-between items-center px-6 md:px-10 py-5 bg-[#070708]/70 backdrop-blur-xl border-b border-white/5">
+ <img src="img/dejota_logo.png" alt="dejota" class="h-6 md:h-7 w-auto">
+ <button id="openG" class="text-[11px] tracking-[0.25em] uppercase px-5 py-2 rounded-full border border-white/15 hover:bg-white/10 transition">GALERÍA</button>
+</nav>
+
+<section class="relative min-h-[85vh] flex items-center justify-center pt-[68px] overflow-hidden bg-[#070708]">
+  <img src="img/DSCF6919.jpg" alt="dejota" class="absolute inset-0 w-full h-full object-cover opacity-[0.55]">
+  <div class="absolute inset-0 bg-gradient-to-b from-[#070708]/10 via-[#070708]/30 to-[#070708]"></div>
+  <div class="relative z-10 flex flex-col items-center">
+    <img src="img/dejota_logo.png" alt="dejota." class="w-[280px] md:w-[480px] lg:w-[560px] h-auto drop-shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
+  </div>
+</section>
+
+<section class="px-3 md:px-10 py-8 bg-[#070708]">
+ <div class="max-w-[900px] mx-auto">
+    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/5NpCde9H57MxIZqbmfkElY?utm_source=generator&theme=0" width="100%" height="500" frameBorder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+ </div>
+</section>
+
+<div id="gal" class="fixed inset-0 z-[100] bg-[#050505] translate-y-full transition-transform duration-[600ms] overflow-y-auto">
+  <div class="sticky top-0 z-10 flex justify-between items-center px-6 md:px-10 py-5 bg-[#050505]/90 backdrop-blur-xl border-b border-white/10">
+    <img src="img/dejota_logo.png" class="h-5 w-auto">
+    <button id="closeG" class="w-10 h-10 rounded-full border border-white/20 bg-white/5 flex items-center justify-center">✕</button>
+  </div>
+  <div class="px-3 md:px-6 py-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+    <img src="img/distribucion_5.jpg" class="rounded-[18px] aspect-[4/5] object-cover bg-[#111]">
+    <img src="img/distribucion_4.jpg" class="rounded-[18px] aspect-[4/5] object-cover bg-[#111]">
+    <img src="img/distribucion_3.jpg" class="rounded-[18px] aspect-[4/5] object-cover bg-[#111]">
+    <img src="img/distribucion_2.jpg" class="rounded-[18px] aspect-[4/5] object-cover bg-[#111]">
+    <img src="img/distribucion_1.jpg" class="rounded-[18px] aspect-[4/5] object-cover bg-[#111]">
+    <img src="img/DSCF7539.jpg" class="rounded-[18px] aspect-[4/5] object-cover bg-[#111]">
+    <img src="img/DSCF7551.jpg" class="rounded-[18px] aspect-[4/5] object-cover bg-[#111]">
+    <img src="img/DSCF7560.jpg" class="rounded-[18px] aspect-[4/5] object-cover bg-[#111]">
+    <img src="img/DSCF7574.jpg" class="rounded-[18px] aspect-[4/5] object-cover bg-[#111]">
+    <img src="img/DSCF6944.jpg" class="rounded-[18px] aspect-[4/5] object-cover bg-[#111]">
+    <img src="img/DSCF6946.jpg" class="rounded-[18px] aspect-[4/5] object-cover bg-[#111]">
+    <img src="img/DSCF6959.jpg" class="rounded-[18px] aspect-[4/5] object-cover bg-[#111]">
+  </div>
+</div>
+
+<footer class="px-6 md:px-10 py-10 flex justify-between text-[10px] tracking-[0.2em] uppercase opacity-30 border-t border-white/5">
+ <span>© 2026 dejota.art</span><a href="https://instagram.com/dejota2021" target="_blank">IG: @dejota2021</a>
+</footer>
+
+<script>
+const g=document.getElementById('gal');
+document.getElementById('openG').onclick=()=>{g.style.transform='translateY(0)';document.body.style.overflow='hidden'};
+document.getElementById('closeG').onclick=()=>{g.style.transform='translateY(100%)';document.body.style.overflow=''};
+</script>
+</body>
+</html>
