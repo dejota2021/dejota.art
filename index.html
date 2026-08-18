@@ -21,18 +21,40 @@
   <img src="img/Shows.jpg" alt="dejota" class="w-full max-w-[1600px] mx-auto object-contain" onerror="this.src='img/shows.jpg'">
 </section>
 
-<!-- SPLIT VIDEO + SPOTIFY -->
+<!-- SPLIT YOUTUBE CANAL + SPOTIFY -->
 <section class="w-full bg-[#070708] px-3 md:px-4 py-4 md:py-6">
   <div class="max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4 items-stretch">
-    <!-- VIDEO IZQ -->
-    <div class="relative w-full bg-black rounded-[20px] overflow-hidden aspect-video lg:aspect-[16/9.5]">
-      <iframe class="w-full h-full absolute inset-0"
-        src="https://www.youtube.com/embed/aEAVGuFWrlk?autoplay=1&mute=1&loop=1&playlist=aEAVGuFWrlk&controls=1&modestbranding=1&rel=0&playsinline=1"
-        title="Dejota Video"
-        frameborder="0"
-        allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-        allowfullscreen></iframe>
-      <div class="pointer-events-none absolute top-3 left-3 px-3 py-1 rounded-full bg-white/10 backdrop-blur text-white text-[9px] tracking-[0.3em]">VIDEO • AUTOPLAY</div>
+    <!-- YOUTUBE CANAL IZQ -->
+    <div class="relative w-full bg-black rounded-[20px] overflow-hidden flex flex-col min-h-[400px] lg:min-h-[520px] border border-white/10">
+      <!-- Header canal -->
+      <div class="flex justify-between items-center px-4 py-3 bg-[#0f0f0f] border-b border-white/10">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center text-[10px] font-bold">▶</div>
+          <div class="flex flex-col">
+            <span class="text-white text-[11px] tracking-[0.25em] uppercase font-semibold">YOUTUBE / DEJOTA</span>
+            <a href="https://www.youtube.com/channel/UCvDdXLEkdMLcaZSO_UyTC3Q" target="_blank" class="text-white/40 text-[9px] tracking-[0.2em] hover:text-white/70 transition">UCvDdXLEkdMLcaZSO_UyTC3Q</a>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="hidden md:inline-block px-3 py-1 rounded-full bg-white/10 backdrop-blur text-white text-[9px] tracking-[0.25em]">CANAL • LIVE</span>
+          <a href="https://www.youtube.com/channel/UCvDdXLEkdMLcaZSO_UyTC3Q?sub_confirmation=1" target="_blank" class="px-4 py-1.5 rounded-full bg-[#FF0000] text-white text-[10px] tracking-[0.15em] uppercase font-bold hover:bg-[#cc0000] transition">Suscribirse</a>
+        </div>
+      </div>
+      <!-- Player del canal - muestra todos los uploads -->
+      <div class="relative flex-1 bg-black">
+        <iframe class="w-full h-full absolute inset-0"
+          src="https://www.youtube.com/embed?listType=playlist&list=UUvDdXLEkdMLcaZSO_UyTC3Q&modestbranding=1&rel=0&playsinline=1"
+          title="Dejota YouTube Channel"
+          frameborder="0"
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+          allowfullscreen
+          loading="lazy"></iframe>
+      </div>
+      <!-- Footer con link directo -->
+      <div class="flex justify-between items-center px-4 py-2.5 bg-[#0f0f0f] border-t border-white/10">
+        <span class="text-white/30 text-[9px] tracking-[0.2em] uppercase">Últimos videos del canal</span>
+        <a href="https://www.youtube.com/channel/UCvDdXLEkdMLcaZSO_UyTC3Q" target="_blank" class="text-white/60 text-[10px] tracking-[0.2em] uppercase hover:text-white transition flex items-center gap-1">Ver canal completo ↗</a>
+      </div>
     </div>
     <!-- SPOTIFY DER -->
     <div class="relative w-full bg-[#121212] rounded-[20px] overflow-hidden p-3 flex flex-col min-h-[400px] lg:min-h-[520px]">
