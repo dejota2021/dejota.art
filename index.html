@@ -1,6 +1,27 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
+<head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>dejota</title>
@@ -24,15 +45,19 @@
 <!-- SPLIT VIDEO + SPOTIFY -->
 <section class="w-full bg-[#070708] px-3 md:px-4 py-4 md:py-6">
   <div class="max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4 items-stretch">
-    <!-- VIDEO IZQ -->
-    <div class="relative w-full bg-black rounded-[20px] overflow-hidden aspect-video lg:aspect-[16/9.5]">
-      <iframe class="w-full h-full absolute inset-0"
-        src="https://www.youtube.com/embed/vFhUfgFUBVk?autoplay=1&mute=1&loop=1&playlist=vFhUfgFUBVk&controls=1&modestbranding=1&rel=0&playsinline=1"
-        title="Dejota Video"
-        frameborder="0"
-        allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-        allowfullscreen></iframe>
-      <div class="pointer-events-none absolute top-3 left-3 px-3 py-1 rounded-full bg-white/10 backdrop-blur text-white text-[9px] tracking-[0.3em]">VIDEO • AUTOPLAY</div>
+    <!-- VIDEO IZQ - CLICK TO PLAY PARA QUE CUENTE COMO VIEW -->
+    <div id="videoWrap" class="relative w-full bg-black rounded-[20px] overflow-hidden aspect-video lg:aspect-[16/9.5] group cursor-pointer">
+      <div id="videoFacade" class="absolute inset-0 w-full h-full">
+        <img src="https://img.youtube.com/vi/vFhUfgFUBVk/maxresdefault.jpg" alt="Dejota Video" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-500">
+        <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-[68px] h-[68px] md:w-[84px] md:h-[84px] rounded-full bg-white text-black flex items-center justify-center shadow-[0_0_40px_rgba(255,255,255,0.2)] group-hover:scale-110 transition duration-300">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" class="ml-[3px]"><path d="M8 5.14v14l11-7-11-7z"/></svg>
+          </div>
+        </div>
+        <div class="absolute top-3 left-3 px-3 py-1 rounded-full bg-white/10 backdrop-blur text-white text-[9px] tracking-[0.3em] border border-white/10">VIDEO</div>
+        <div class="absolute bottom-3 right-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur text-white text-[8px] tracking-[0.2em]">CLICK PARA REPRODUCIR — SUMA VIEW</div>
+      </div>
     </div>
     <!-- SPOTIFY DER -->
     <div class="relative w-full bg-[#121212] rounded-[20px] overflow-hidden p-3 flex flex-col min-h-[400px] lg:min-h-[520px]">
@@ -58,6 +83,22 @@ const all=["img/distribucion_5.jpg","img/distribucion_4.jpg","img/distribucion_3
 const grid=document.getElementById('grid');
 all.forEach(s=>{const w=document.createElement('div');w.className='rounded-[18px] aspect-[4/5] overflow-hidden bg-[#111] group';const i=document.createElement('img');i.loading='lazy';i.className='w-full h-full object-cover group-hover:scale-[1.03] transition duration-700';i.src=s;i.onerror=function(){this.src=s.toLowerCase()};w.appendChild(i);grid.appendChild(w);});
 const canvas=document.getElementById('pc'),ctx=canvas.getContext('2d'),dot=document.getElementById('dot'),ring=document.getElementById('ring');let particles=[],mouse={x:-100,y:-100},rp={x:-100,y:-100},hov=false,gOpen=false;function rs(){const d=window.devicePixelRatio||1;canvas.width=innerWidth*d;canvas.height=innerHeight*d;canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';ctx.setTransform(d,0,0,d,0,0);}rs();addEventListener('resize',rs);const gal=document.getElementById('gal');addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px';for(let k=0;k<(hov?4:2);k++)particles.push({x:e.clientX+(Math.random()-0.5)*6,y:e.clientY+(Math.random()-0.5)*6,vx:(Math.random()-0.5)*1.2,vy:(Math.random()-0.5)*1.2,size:Math.random()*1.8+0.3,life:1,dec:0.018+Math.random()*0.03,t:Math.random()>0.85?'sq':'d'})});document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>{hov=true;ring.style.width='42px';ring.style.height='42px'});el.addEventListener('mouseleave',()=>{hov=false;ring.style.width='26px';ring.style.height='26px'})});function anim(){ctx.clearRect(0,0,innerWidth,innerHeight);rp.x+=(mouse.x-rp.x)*0.15;rp.y+=(mouse.y-rp.y)*0.15;ring.style.left=rp.x+'px';ring.style.top=rp.y+'px';for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vx*=0.98;p.vy*=0.98;p.vy+=0.02;p.life-=p.dec;if(p.life<=0){particles.splice(i,1);continue}ctx.globalAlpha=p.life;const b=gOpen?255:0;ctx.fillStyle=`rgba(${b},${b},${b},${p.life})`;if(p.t==='sq')ctx.fillRect(p.x,p.y,p.size,p.size);else{ctx.beginPath();ctx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2);ctx.fill()}}ctx.globalAlpha=1;requestAnimationFrame(anim)}anim();if('ontouchstart' in window) {canvas.style.display='none';dot.style.display='none';ring.style.display='none'}document.getElementById('openG').onclick=()=>{gal.style.transform='translateY(0)';document.body.style.overflow='hidden';gOpen=true};document.getElementById('closeG').onclick=()=>{gal.style.transform='translateY(100%)';document.body.style.overflow='';gOpen=false};
+
+// VIDEO LOGIC - carga solo con click para que cuente como view
+const videoWrap = document.getElementById('videoWrap');
+const videoFacade = document.getElementById('videoFacade');
+videoWrap.addEventListener('click', () => {
+  const iframe = document.createElement('iframe');
+  iframe.className = 'w-full h-full absolute inset-0';
+  iframe.src = 'https://www.youtube.com/embed/vFhUfgFUBVk?autoplay=1&rel=0&modestbranding=1&controls=1&playsinline=1';
+  iframe.title = 'Dejota Video';
+  iframe.frameBorder = '0';
+  iframe.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
+  iframe.allowFullscreen = true;
+  videoWrap.innerHTML = '';
+  videoWrap.appendChild(iframe);
+}, { once: true });
+
 </script>
-</body>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
 </html>
