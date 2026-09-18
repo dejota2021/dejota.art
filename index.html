@@ -11,15 +11,13 @@
   @media (pointer: fine){ *{cursor:none !important} a,button{cursor:none !important} }
   .no-scrollbar::-webkit-scrollbar{display:none}
   .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
-  /* mini carrete top - MAS GRANDE */
-  #miniWrap{height:96px;background:#000;overflow:hidden;position:relative;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.08);touch-action:pan-y}
-  @media(max-width:768px){#miniWrap{height:84px}}
-  #miniTrack{display:flex;gap:8px;will-change:transform;height:100%;align-items:center;padding:0 8px}
-  .mini-item{flex:0 0 auto;width:148px;height:78px;border-radius:12px;overflow:hidden;background:#111;cursor:pointer;border:1px solid rgba(255,255,255,.14);transition:transform .2s, border-color .2s}
-  .mini-item:hover{transform:scale(1.04);border-color:rgba(255,255,255,.4)}
-  @media(max-width:768px){.mini-item{width:124px;height:68px;border-radius:10px}}
+  #miniWrap{height:118px;background:#000;overflow:hidden;position:relative;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.08);touch-action:pan-y}
+  @media(max-width:768px){#miniWrap{height:102px}}
+  #miniTrack{display:flex;gap:10px;will-change:transform;height:100%;align-items:center;padding:0 10px}
+  .mini-item{flex:0 0 auto;width:182px;height:98px;border-radius:14px;overflow:hidden;background:#111;cursor:pointer;border:1px solid rgba(255,255,255,.14);transition:transform .2s, border-color .2s}
+  .mini-item:hover{transform:scale(1.05);border-color:rgba(255,255,255,.45)}
+  @media(max-width:768px){.mini-item{width:152px;height:84px;border-radius:12px}}
   .mini-item img{width:100%;height:100%;object-fit:cover;pointer-events:none}
-  /* big overlay */
   #bigOverlay{position:fixed;inset:0;z-index:120;background:rgba(5,5,5,.96);backdrop-filter:blur(18px);display:none;flex-direction:column;opacity:0;transition:opacity .35s}
   #bigOverlay.open{display:flex;opacity:1}
   #bigTrackWrap{flex:1;overflow:hidden;display:flex;align-items:center;position:relative;touch-action:pan-y}
@@ -34,19 +32,19 @@
 
 <nav class="fixed top-0 w-full z-40 flex justify-between items-center px-6 md:px-10 py-5 bg-white/70 backdrop-blur-xl border-b border-black/5">
  <span class="font-bold tracking-[0.2em] text-[12px]">DEJOTA®</span>
- <span class="text-[9px] tracking-[0.25em] uppercase opacity-40">MED — 2026</span>
+ <span class="w-2 h-2 rounded-full bg-black/20"></span>
 </nav>
 
-<!-- CARRETE MAS GRANDE -->
-<div class="pt-[64px] bg-black">
+<section class="relative w-full bg-white flex items-center justify-center pt-[64px]">
+  <img src="img/Shows.jpg" alt="dejota" class="w-full max-w-[1600px] mx-auto object-contain" onerror="this.src='img/shows.jpg'">
+</section>
+
+<!-- CARRETE MAS GRANDE ANTES DE VIDEO + SPOTIFY -->
+<div class="bg-black">
   <div id="miniWrap" class="no-scrollbar">
     <div id="miniTrack"></div>
   </div>
 </div>
-
-<section class="relative w-full bg-white flex items-center justify-center">
-  <img src="img/Shows.jpg" alt="dejota" class="w-full max-w-[1600px] mx-auto object-contain" onerror="this.src='img/shows.jpg'">
-</section>
 
 <!-- SPLIT VIDEO + SPOTIFY -->
 <section class="w-full bg-[#070708] px-3 md:px-4 py-4 md:py-6">
@@ -70,13 +68,8 @@
   </div>
 </section>
 
-<section class="w-full bg-white pt-8 pb-2 px-6 md:px-10">
-  <h2 class="text-[10px] tracking-[0.35em] uppercase opacity-30">archivo visual — 13 piezas</h2>
-</section>
-
 <footer class="px-6 md:px-10 py-10 flex justify-between text-[10px] tracking-[0.2em] uppercase opacity-40 border-t border-black/5 bg-white"><span>© 2026 dejota.art</span><a href="https://instagram.com/dejota2021">IG: @dejota2021</a></footer>
 
-<!-- OVERLAY GRANDE -->
 <div id="bigOverlay">
   <button id="bigClose">✕</button>
   <div id="bigTrackWrap" class="no-scrollbar">
@@ -94,7 +87,6 @@
 
 <script>
 const all=["img/distribucion_5.jpg","img/distribucion_4.jpg","img/distribucion_3.jpg","img/distribucion_2.jpg","img/distribucion_1.jpg","img/DSCF7539.jpg","img/DSCF7551.jpg","img/DSCF7560.jpg","img/DSCF7574.jpg","img/DSCF6944.jpg","img/DSCF6946.jpg","img/DSCF6959.jpg","img/DSCF6919.jpg"];
-
 const miniTrack=document.getElementById('miniTrack');
 const bigTrack=document.getElementById('bigTrack');
 const miniWrap=document.getElementById('miniWrap');
@@ -117,7 +109,6 @@ function buildTracks(){
 }
 buildTracks();
 
-// VELOCIDAD REDUCIDA 30% (antes 0.8 -> ahora 0.56)
 let velMini = 0.56;
 let velBig = 0.63;
 let targetMini = 0.56;
@@ -127,7 +118,6 @@ let offsetMini=0;
 let offsetBig=0;
 
 function lerp(a,b,t){ return a + (b-a)*t; }
-
 function loop(){
   offsetMini += velMini;
   offsetBig += velBig;
@@ -137,94 +127,66 @@ function loop(){
   const halfBig = bigTrack.scrollWidth/2;
   if(offsetBig > halfBig) offsetBig -= halfBig;
   if(offsetBig < 0) offsetBig += halfBig;
-
   miniTrack.style.transform = `translateX(${-offsetMini}px)`;
   bigTrack.style.transform = `translateX(${-offsetBig}px)`;
-
-  velMini = lerp(velMini, targetMini, 0.045); // más suave
+  velMini = lerp(velMini, targetMini, 0.045);
   velBig = lerp(velBig, targetBig, 0.045);
-
-  // mínimo nunca 0, reducido 30% también (antes 0.25 -> 0.175)
   if(Math.abs(velMini) < 0.175) velMini = velMini >=0 ? 0.175 : -0.175;
   if(Math.abs(velBig) < 0.175) velBig = velBig >=0 ? 0.175 : -0.175;
-
   requestAnimationFrame(loop);
 }
 loop();
 
-// MOUSE GLOBAL - dirección continua
 document.addEventListener('mousemove', (e)=>{
   const dx = e.clientX - lastMouseX;
   if(Math.abs(dx) > 1){
     const dir = dx > 0 ? -1 : 1;
-    // intensidad reducida 30%: antes 0.12*dx+0.6 max 3.2 -> ahora 0.084*dx+0.42 max 2.24
     const intensity = Math.min(Math.abs(dx)*0.084 + 0.42, 2.24);
     targetMini = dir * intensity;
-    if(bigOverlay.classList.contains('open')){
-      targetBig = dir * (intensity*1.1);
-    }
+    if(bigOverlay.classList.contains('open')) targetBig = dir * (intensity*1.1);
   }
   lastMouseX = e.clientX;
 });
-
-// Hover sobre mini: controla dirección por posición (más intuitivo)
 miniWrap.addEventListener('mousemove', (e)=>{
   const rect=miniWrap.getBoundingClientRect();
   const rel = (e.clientX - rect.left)/rect.width;
   const centered = rel - 0.5;
-  // reducido 30%: antes 4.5 -> 3.15
   targetMini = centered * 3.15;
   if(Math.abs(targetMini) < 0.2) targetMini = targetMini >=0 ? 0.2 : -0.2;
 });
 
-// TOUCH CELULAR - inercia que continúa
-let touchStartX=0, lastTouchX=0, touchVel=0, touchRaf=null;
-let touchActive=false;
-
-function handleTouchStart(e){
-  touchActive=true;
-  touchStartX=e.touches[0].clientX;
-  lastTouchX=touchStartX;
-  touchVel=0;
-}
+let touchStartX=0, lastTouchX=0, touchVel=0, touchActive=false;
+function handleTouchStart(e){ touchActive=true; touchStartX=e.touches[0].clientX; lastTouchX=touchStartX; touchVel=0; }
 function handleTouchMove(e){
   if(!touchActive) return;
   const curX=e.touches[0].clientX;
   const dx=curX - lastTouchX;
-  touchVel = dx; // velocidad instantánea
+  touchVel = dx;
   lastTouchX=curX;
-  // dirección invertida para carrete
   const dir = dx > 0 ? -1 : 1;
   const intensity = Math.min(Math.abs(dx)*0.06 + 0.35, 2.2);
   targetMini = dir * intensity;
-  if(bigOverlay.classList.contains('open')){
-    targetBig = dir * intensity * 1.1;
-  }
+  if(bigOverlay.classList.contains('open')) targetBig = dir * intensity * 1.1;
 }
 function handleTouchEnd(){
   touchActive=false;
-  // la velocidad target se mantiene con la última inercia, no se resetea a 0 -> continúa
-  // dejamos que siga con la última dirección calculada
   const finalDir = touchVel > 0 ? -1 : 1;
   const finalInt = Math.min(Math.abs(touchVel)*0.05 + 0.4, 1.8);
   targetMini = finalDir * finalInt;
   if(bigOverlay.classList.contains('open')) targetBig = finalDir * finalInt * 1.1;
 }
-
 miniWrap.addEventListener('touchstart', handleTouchStart, {passive:true});
 miniWrap.addEventListener('touchmove', handleTouchMove, {passive:true});
 miniWrap.addEventListener('touchend', handleTouchEnd, {passive:true});
-
 bigWrap.addEventListener('touchstart', handleTouchStart, {passive:true});
 bigWrap.addEventListener('touchmove', handleTouchMove, {passive:true});
 bigWrap.addEventListener('touchend', handleTouchEnd, {passive:true});
 
-// Abrir grande
 function openBig(idx){
   bigOverlay.classList.add('open');
   bigOverlay.style.display='flex';
   document.body.style.overflow='hidden';
-  const itemW = 914; // 900+14
+  const itemW = 914;
   offsetBig = idx * itemW;
   targetBig = targetMini !==0 ? targetMini*1.05 : 0.63;
   requestAnimationFrame(()=> bigOverlay.classList.add('open'));
@@ -238,7 +200,6 @@ bigOverlay.addEventListener('click', (e)=>{ if(e.target === bigOverlay || e.targ
 bigWrap.addEventListener('click', (e)=>{ if(!e.target.closest('.big-item')) closeBig(); });
 document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeBig(); });
 
-// VIDEO
 const videoWrap=document.getElementById('videoWrap');
 if(videoWrap){
   videoWrap.addEventListener('click', () => {
@@ -251,7 +212,6 @@ if(videoWrap){
   }, { once: true });
 }
 
-// SPOTIFY autoplay al interactuar
 let musicStarted=false;
 function startMusic(){
   if(musicStarted) return;
@@ -265,7 +225,6 @@ function startMusic(){
   document.addEventListener(ev, startMusic, {once:true, passive:true});
 });
 
-// CURSOR
 const canvas=document.getElementById('pc'),ctx=canvas.getContext('2d'),dot=document.getElementById('dot'),ring=document.getElementById('ring');let particles=[],mouse={x:-100,y:-100},rp={x:-100,y:-100},hov=false;
 function rs(){const d=window.devicePixelRatio||1;canvas.width=innerWidth*d;canvas.height=innerHeight*d;canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';ctx.setTransform(d,0,0,d,0,0);}rs();addEventListener('resize',rs);
 addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px';for(let k=0;k<(hov?4:2);k++)particles.push({x:e.clientX+(Math.random()-0.5)*6,y:e.clientY+(Math.random()-0.5)*6,vx:(Math.random()-0.5)*1.2,vy:(Math.random()-0.5)*1.2,size:Math.random()*1.8+0.3,life:1,dec:0.018+Math.random()*0.03,t:Math.random()>0.85?'sq':'d'})});
