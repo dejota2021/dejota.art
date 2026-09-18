@@ -15,9 +15,7 @@
   #miniWrap:active{cursor:grabbing}
   @media(max-width:768px){#miniWrap{height:102px}}
   #miniTrack{display:flex;gap:10px;will-change:transform;height:100%;align-items:center;padding:0 10px}
-  .mini-item{flex:0 0 auto;width:182px;height:98px;border-radius:14px;overflow:hidden;background:#111;cursor:pointer;border:1px solid rgba(255,255,255,.14);transition:border-color .2s}
-  .mini-item:hover{border-color:rgba(255,255,255,.45)}
-  @media(max-width:768px){.mini-item{width:152px;height:84px;border-radius:12px}}
+  .mini-item{flex:0 0 auto;width:182px;height:98px;border-radius:14px;overflow:hidden;background:#111;cursor:pointer;border:1px solid rgba(255,255,255,.14)}
   .mini-item img{width:100%;height:100%;object-fit:cover;pointer-events:none}
   #bigOverlay{position:fixed;inset:0;z-index:120;background:rgba(5,5,5,.96);backdrop-filter:blur(18px);display:none;flex-direction:column;opacity:0;transition:opacity .35s}
   #bigOverlay.open{display:flex;opacity:1}
@@ -28,32 +26,23 @@
   @media(min-width:1024px){.big-item{width:62vw;height:78vh}}
   .big-item img{width:100%;height:100%;object-fit:cover;pointer-events:none}
   #bigClose{position:absolute;top:18px;right:18px;z-index:10;width:40px;height:40px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff}
-  /* espacio blanco pequeño */
-  .gap-white{height:14px;background:#fff;width:100%}
+  .gap-white{height:110px;background:#fff;width:100%}
+  @media(max-width:768px){.gap-white{height:72px}}
+  @media(min-width:1400px){.gap-white{height:140px}}
 </style>
 </head>
 <body class="bg-white antialiased">
-
 <nav class="fixed top-0 w-full z-40 flex justify-between items-center px-6 md:px-10 py-5 bg-white/70 backdrop-blur-xl border-b border-black/5">
  <span class="font-bold tracking-[0.2em] text-[12px]">DEJOTA®</span>
  <span class="w-2 h-2 rounded-full bg-black/20"></span>
 </nav>
-
 <section class="relative w-full bg-white flex items-center justify-center pt-[64px]">
   <img src="img/Shows.jpg" alt="dejota" class="w-full max-w-[1600px] mx-auto object-contain" onerror="this.src='img/shows.jpg'">
 </section>
-
-<!-- CARRETE -->
 <div class="bg-black">
-  <div id="miniWrap" class="no-scrollbar">
-    <div id="miniTrack"></div>
-  </div>
+  <div id="miniWrap" class="no-scrollbar"><div id="miniTrack"></div></div>
 </div>
-
-<!-- ESPACIO BLANCO PEQUEÑO -->
 <div class="gap-white"></div>
-
-<!-- SPLIT VIDEO + SPOTIFY -->
 <section class="w-full bg-[#070708] px-3 md:px-4 py-4 md:py-6">
   <div class="max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4 items-stretch">
     <div id="videoWrap" class="relative w-full bg-black rounded-[20px] overflow-hidden aspect-video lg:aspect-[16/9.5] group cursor-pointer">
@@ -74,189 +63,33 @@
     </div>
   </div>
 </section>
-
 <footer class="px-6 md:px-10 py-10 flex justify-between text-[10px] tracking-[0.2em] uppercase opacity-40 border-t border-black/5 bg-white"><span>© 2026 dejota.art</span><a href="https://instagram.com/dejota2021">IG: @dejota2021</a></footer>
-
-<div id="bigOverlay">
-  <button id="bigClose">✕</button>
-  <div id="bigTrackWrap" class="no-scrollbar">
-    <div id="bigTrack"></div>
-  </div>
-  <div class="px-8 pb-6 flex justify-between items-center">
-    <span class="text-white/30 text-[9px] tracking-[0.3em] uppercase">arrastra con clic o dedo para cambiar dirección • click fuera cierra</span>
-    <span class="text-white/20 text-[9px] tracking-[0.2em]">ESC</span>
-  </div>
-</div>
-
+<div id="bigOverlay"><button id="bigClose">✕</button><div id="bigTrackWrap" class="no-scrollbar"><div id="bigTrack"></div></div><div class="px-8 pb-6 flex justify-between items-center"><span class="text-white/30 text-[9px] tracking-[0.3em] uppercase">arrastra con clic o dedo para cambiar dirección • click fuera cierra</span><span class="text-white/20 text-[9px] tracking-[0.2em]">ESC</span></div></div>
 <canvas id="pc" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;"></canvas>
 <div id="dot" style="position:fixed;width:5px;height:5px;background:#000;border-radius:50%;pointer-events:none;z-index:9999;mix-blend-mode:difference;transform:translate(-50%,-50%)"></div>
 <div id="ring" style="position:fixed;width:26px;height:26px;border:1px solid rgba(0,0,0,.25);border-radius:50%;pointer-events:none;z-index:9999;mix-blend-mode:difference;transform:translate(-50%,-50%);transition:.2s"></div>
-
 <script>
 const all=["img/distribucion_5.jpg","img/distribucion_4.jpg","img/distribucion_3.jpg","img/distribucion_2.jpg","img/distribucion_1.jpg","img/DSCF7539.jpg","img/DSCF7551.jpg","img/DSCF7560.jpg","img/DSCF7574.jpg","img/DSCF6944.jpg","img/DSCF6946.jpg","img/DSCF6959.jpg","img/DSCF6919.jpg"];
-const miniTrack=document.getElementById('miniTrack');
-const bigTrack=document.getElementById('bigTrack');
-const miniWrap=document.getElementById('miniWrap');
-const bigOverlay=document.getElementById('bigOverlay');
-const bigWrap=document.getElementById('bigTrackWrap');
-
-function buildTracks(){
-  const total = [...all, ...all, ...all, ...all];
-  total.forEach((src,i)=>{
-    const el=document.createElement('div'); el.className='mini-item'; el.dataset.idx=i % all.length;
-    el.innerHTML=`<img src="${src}" loading="lazy" onerror="this.src=this.src.toLowerCase()">`;
-    el.addEventListener('click', (e)=>{
-      // solo abrir si no hubo drag grande
-      if(Math.abs(dragDelta) < 8) openBig(i % all.length);
-    });
-    miniTrack.appendChild(el);
-  });
-  total.forEach((src)=>{
-    const el=document.createElement('div'); el.className='big-item group';
-    el.innerHTML=`<img src="${src}" loading="lazy" onerror="this.src=this.src.toLowerCase()">`;
-    bigTrack.appendChild(el);
-  });
-}
+const miniTrack=document.getElementById('miniTrack');const bigTrack=document.getElementById('bigTrack');const miniWrap=document.getElementById('miniWrap');const bigOverlay=document.getElementById('bigOverlay');const bigWrap=document.getElementById('bigTrackWrap');
+function buildTracks(){const total=[...all,...all,...all,...all];total.forEach((src,i)=>{const el=document.createElement('div');el.className='mini-item';el.dataset.idx=i%all.length;el.innerHTML=`<img src="${src}" loading="lazy" onerror="this.src=this.src.toLowerCase()">`;el.addEventListener('click',()=>{if(Math.abs(dragDelta)<8)openBig(i%all.length)});miniTrack.appendChild(el)});total.forEach((src)=>{const el=document.createElement('div');el.className='big-item group';el.innerHTML=`<img src="${src}" loading="lazy" onerror="this.src=this.src.toLowerCase()">`;bigTrack.appendChild(el)})}
 buildTracks();
-
-let velMini = 0.56;
-let velBig = 0.63;
-let targetMini = 0.56;
-let targetBig = 0.63;
-let offsetMini=0;
-let offsetBig=0;
-let dragDelta=0;
-
-function lerp(a,b,t){ return a + (b-a)*t; }
-function loop(){
-  offsetMini += velMini;
-  offsetBig += velBig;
-  const halfMini = miniTrack.scrollWidth/2;
-  if(offsetMini > halfMini) offsetMini -= halfMini;
-  if(offsetMini < 0) offsetMini += halfMini;
-  const halfBig = bigTrack.scrollWidth/2;
-  if(offsetBig > halfBig) offsetBig -= halfBig;
-  if(offsetBig < 0) offsetBig += halfBig;
-  miniTrack.style.transform = `translateX(${-offsetMini}px)`;
-  bigTrack.style.transform = `translateX(${-offsetBig}px)`;
-  velMini = lerp(velMini, targetMini, 0.045);
-  velBig = lerp(velBig, targetBig, 0.045);
-  if(Math.abs(velMini) < 0.175) velMini = velMini >=0 ? 0.175 : -0.175;
-  if(Math.abs(velBig) < 0.175) velBig = velBig >=0 ? 0.175 : -0.175;
-  requestAnimationFrame(loop);
-}
-loop();
-
-// --- SOLO CLIC Y TOUCH (no mousemove suelto) ---
-let isDragging=false, startX=0, lastX=0, lastVel=0;
-
-function onDragStart(clientX){
-  isDragging=true;
-  startX=clientX;
-  lastX=clientX;
-  lastVel=0;
-  dragDelta=0;
-  miniWrap.style.cursor='grabbing';
-}
-function onDragMove(clientX, isBig=false){
-  if(!isDragging) return;
-  const dx = clientX - lastX;
-  dragDelta += dx;
-  lastVel = dx;
-  lastX = clientX;
-  // cambia dirección según movimiento del drag
-  const dir = dx > 0 ? -1 : 1;
-  const intensity = Math.min(Math.abs(dx)*0.14 + 0.35, 2.2);
-  if(!isBig){
-    targetMini = dir * intensity;
-  } else {
-    targetBig = dir * intensity * 1.1;
-    targetMini = dir * intensity; // sincroniza mini también
-  }
-}
-function onDragEnd(isBig=false){
-  if(!isDragging) return;
-  isDragging=false;
-  miniWrap.style.cursor='grab';
-  // inercia: continúa con última velocidad
-  const finalDir = lastVel > 0 ? -1 : 1;
-  const finalInt = Math.min(Math.abs(lastVel)*0.12 + 0.42, 1.9);
-  if(!isBig){
-    targetMini = finalDir * finalInt;
-  } else {
-    targetBig = finalDir * finalInt * 1.1;
-    targetMini = finalDir * finalInt;
-  }
-  setTimeout(()=> dragDelta=0, 50);
-}
-
-// Desktop clic-drag mini
-miniWrap.addEventListener('mousedown', e=> onDragStart(e.clientX));
-window.addEventListener('mousemove', e=> { if(isDragging && !bigOverlay.classList.contains('open')) onDragMove(e.clientX,false); });
-window.addEventListener('mouseup', ()=> { if(!bigOverlay.classList.contains('open')) onDragEnd(false); });
-
-// Desktop clic-drag big
-bigWrap.addEventListener('mousedown', e=>{ onDragStart(e.clientX); });
-window.addEventListener('mousemove', e=>{ if(isDragging && bigOverlay.classList.contains('open')) onDragMove(e.clientX,true); });
-window.addEventListener('mouseup', ()=>{ if(bigOverlay.classList.contains('open')) onDragEnd(true); });
-
-// Touch
-miniWrap.addEventListener('touchstart', e=> onDragStart(e.touches[0].clientX), {passive:true});
-miniWrap.addEventListener('touchmove', e=> onDragMove(e.touches[0].clientX,false), {passive:true});
-miniWrap.addEventListener('touchend', ()=> onDragEnd(false), {passive:true});
-
-bigWrap.addEventListener('touchstart', e=> onDragStart(e.touches[0].clientX), {passive:true});
-bigWrap.addEventListener('touchmove', e=> onDragMove(e.touches[0].clientX,true), {passive:true});
-bigWrap.addEventListener('touchend', ()=> onDragEnd(true), {passive:true});
-
-function openBig(idx){
-  bigOverlay.classList.add('open');
-  bigOverlay.style.display='flex';
-  document.body.style.overflow='hidden';
-  const itemW = 914;
-  offsetBig = idx * itemW;
-  targetBig = targetMini !==0 ? targetMini*1.05 : 0.63;
-}
-function closeBig(){
-  bigOverlay.classList.remove('open');
-  setTimeout(()=>{ bigOverlay.style.display='none'; document.body.style.overflow=''; }, 300);
-}
-document.getElementById('bigClose').onclick=closeBig;
-bigOverlay.addEventListener('click', (e)=>{ if(e.target === bigOverlay || e.target === bigWrap) closeBig(); });
-bigWrap.addEventListener('click', (e)=>{ if(!e.target.closest('.big-item') && Math.abs(dragDelta)<8) closeBig(); });
-document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeBig(); });
-
-const videoWrap=document.getElementById('videoWrap');
-if(videoWrap){
-  videoWrap.addEventListener('click', () => {
-    const iframe=document.createElement('iframe');
-    iframe.className='w-full h-full absolute inset-0';
-    iframe.src='https://www.youtube.com/embed/vFhUfgFUBVk?autoplay=1&rel=0&modestbranding=1&controls=1&playsinline=1';
-    iframe.title='Dejota Video'; iframe.frameBorder='0';
-    iframe.allow='autoplay; encrypted-media; fullscreen; picture-in-picture'; iframe.allowFullscreen=true;
-    videoWrap.innerHTML=''; videoWrap.appendChild(iframe);
-  }, { once: true });
-}
-
-let musicStarted=false;
-function startMusic(){
-  if(musicStarted) return;
-  musicStarted=true;
-  const sp=document.getElementById('spotifyFrame');
-  const base = 'https://open.spotify.com/embed/artist/5NpCde9H57MxIZqbmfkElY?utm_source=generator&theme=0';
-  sp.src = base + '&autoplay=1';
-  ['click','keydown','touchstart'].forEach(ev=> document.removeEventListener(ev, startMusic));
-}
-['click','keydown','touchstart'].forEach(ev=>{
-  document.addEventListener(ev, startMusic, {once:true, passive:true});
-});
-
-const canvas=document.getElementById('pc'),ctx=canvas.getContext('2d'),dot=document.getElementById('dot'),ring=document.getElementById('ring');let particles=[],mouse={x:-100,y:-100},rp={x:-100,y:-100},hov=false;
-function rs(){const d=window.devicePixelRatio||1;canvas.width=innerWidth*d;canvas.height=innerHeight*d;canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';ctx.setTransform(d,0,0,d,0,0);}rs();addEventListener('resize',rs);
-addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px';for(let k=0;k<(hov?4:2);k++)particles.push({x:e.clientX+(Math.random()-0.5)*6,y:e.clientY+(Math.random()-0.5)*6,vx:(Math.random()-0.5)*1.2,vy:(Math.random()-0.5)*1.2,size:Math.random()*1.8+0.3,life:1,dec:0.018+Math.random()*0.03,t:Math.random()>0.85?'sq':'d'})});
-document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>{hov=true;ring.style.width='42px';ring.style.height='42px'});el.addEventListener('mouseleave',()=>{hov=false;ring.style.width='26px';ring.style.height='26px'})});
-function anim(){ctx.clearRect(0,0,innerWidth,innerHeight);rp.x+=(mouse.x-rp.x)*0.15;rp.y+=(mouse.y-rp.y)*0.15;ring.style.left=rp.x+'px';ring.style.top=rp.y+'px';for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vx*=0.98;p.vy*=0.98;p.vy+=0.02;p.life-=p.dec;if(p.life<=0){particles.splice(i,1);continue}ctx.globalAlpha=p.life;ctx.fillStyle=`rgba(0,0,0,${p.life})`;if(p.t==='sq')ctx.fillRect(p.x,p.y,p.size,p.size);else{ctx.beginPath();ctx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2);ctx.fill()}}ctx.globalAlpha=1;requestAnimationFrame(anim)}anim();
-if('ontouchstart' in window) {canvas.style.display='none';dot.style.display='none';ring.style.display='none'}
+let velMini=0.56,velBig=0.63,targetMini=0.56,targetBig=0.63,offsetMini=0,offsetBig=0,dragDelta=0;
+function lerp(a,b,t){return a+(b-a)*t}
+function loop(){offsetMini+=velMini;offsetBig+=velBig;const halfMini=miniTrack.scrollWidth/2;if(offsetMini>halfMini)offsetMini-=halfMini;if(offsetMini<0)offsetMini+=halfMini;const halfBig=bigTrack.scrollWidth/2;if(offsetBig>halfBig)offsetBig-=halfBig;if(offsetBig<0)offsetBig+=halfBig;miniTrack.style.transform=`translateX(${-offsetMini}px)`;bigTrack.style.transform=`translateX(${-offsetBig}px)`;velMini=lerp(velMini,targetMini,0.045);velBig=lerp(velBig,targetBig,0.045);if(Math.abs(velMini)<0.175)velMini=velMini>=0?0.175:-0.175;if(Math.abs(velBig)<0.175)velBig=velBig>=0?0.175:-0.175;requestAnimationFrame(loop)}loop();
+let isDragging=false,startX=0,lastX=0,lastVel=0;
+function onDragStart(clientX){isDragging=true;startX=clientX;lastX=clientX;lastVel=0;dragDelta=0;miniWrap.style.cursor='grabbing'}
+function onDragMove(clientX,isBig=false){if(!isDragging)return;const dx=clientX-lastX;dragDelta+=dx;lastVel=dx;lastX=clientX;const dir=dx>0?-1:1;const intensity=Math.min(Math.abs(dx)*0.14+0.35,2.2);if(!isBig){targetMini=dir*intensity}else{targetBig=dir*intensity*1.1;targetMini=dir*intensity}}
+function onDragEnd(isBig=false){if(!isDragging)return;isDragging=false;miniWrap.style.cursor='grab';const finalDir=lastVel>0?-1:1;const finalInt=Math.min(Math.abs(lastVel)*0.12+0.42,1.9);if(!isBig){targetMini=finalDir*finalInt}else{targetBig=finalDir*finalInt*1.1;targetMini=finalDir*finalInt}setTimeout(()=>dragDelta=0,50)}
+miniWrap.addEventListener('mousedown',e=>onDragStart(e.clientX));window.addEventListener('mousemove',e=>{if(isDragging&&!bigOverlay.classList.contains('open'))onDragMove(e.clientX,false)});window.addEventListener('mouseup',()=>{if(!bigOverlay.classList.contains('open'))onDragEnd(false)});
+bigWrap.addEventListener('mousedown',e=>{onDragStart(e.clientX)});window.addEventListener('mousemove',e=>{if(isDragging&&bigOverlay.classList.contains('open'))onDragMove(e.clientX,true)});window.addEventListener('mouseup',()=>{if(bigOverlay.classList.contains('open'))onDragEnd(true)});
+miniWrap.addEventListener('touchstart',e=>onDragStart(e.touches[0].clientX),{passive:true});miniWrap.addEventListener('touchmove',e=>onDragMove(e.touches[0].clientX,false),{passive:true});miniWrap.addEventListener('touchend',()=>onDragEnd(false),{passive:true});
+bigWrap.addEventListener('touchstart',e=>onDragStart(e.touches[0].clientX),{passive:true});bigWrap.addEventListener('touchmove',e=>onDragMove(e.touches[0].clientX,true),{passive:true});bigWrap.addEventListener('touchend',()=>onDragEnd(true),{passive:true});
+function openBig(idx){bigOverlay.classList.add('open');bigOverlay.style.display='flex';document.body.style.overflow='hidden';const itemW=914;offsetBig=idx*itemW;targetBig=targetMini!==0?targetMini*1.05:0.63}
+function closeBig(){bigOverlay.classList.remove('open');setTimeout(()=>{bigOverlay.style.display='none';document.body.style.overflow=''},300)}
+document.getElementById('bigClose').onclick=closeBig;bigOverlay.addEventListener('click',e=>{if(e.target===bigOverlay||e.target===bigWrap)closeBig()});bigWrap.addEventListener('click',e=>{if(!e.target.closest('.big-item')&&Math.abs(dragDelta)<8)closeBig()});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeBig()});
+const videoWrap=document.getElementById('videoWrap');if(videoWrap){videoWrap.addEventListener('click',()=>{const iframe=document.createElement('iframe');iframe.className='w-full h-full absolute inset-0';iframe.src='https://www.youtube.com/embed/vFhUfgFUBVk?autoplay=1&rel=0&modestbranding=1&controls=1&playsinline=1';iframe.title='Dejota Video';iframe.frameBorder='0';iframe.allow='autoplay; encrypted-media; fullscreen; picture-in-picture';iframe.allowFullscreen=true;videoWrap.innerHTML='';videoWrap.appendChild(iframe)},{once:true})}
+let musicStarted=false;function startMusic(){if(musicStarted)return;musicStarted=true;const sp=document.getElementById('spotifyFrame');const base='https://open.spotify.com/embed/artist/5NpCde9H57MxIZqbmfkElY?utm_source=generator&theme=0';sp.src=base+'&autoplay=1';['click','keydown','touchstart'].forEach(ev=>document.removeEventListener(ev,startMusic))}['click','keydown','touchstart'].forEach(ev=>{document.addEventListener(ev,startMusic,{once:true,passive:true})});
+const canvas=document.getElementById('pc'),ctx=canvas.getContext('2d'),dot=document.getElementById('dot'),ring=document.getElementById('ring');let particles=[],mouse={x:-100,y:-100},rp={x:-100,y:-100},hov=false;function rs(){const d=window.devicePixelRatio||1;canvas.width=innerWidth*d;canvas.height=innerHeight*d;canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';ctx.setTransform(d,0,0,d,0,0)}rs();addEventListener('resize',rs);addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px';for(let k=0;k<(hov?4:2);k++)particles.push({x:e.clientX+(Math.random()-0.5)*6,y:e.clientY+(Math.random()-0.5)*6,vx:(Math.random()-0.5)*1.2,vy:(Math.random()-0.5)*1.2,size:Math.random()*1.8+0.3,life:1,dec:0.018+Math.random()*0.03,t:Math.random()>0.85?'sq':'d'})});document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>{hov=true;ring.style.width='42px';ring.style.height='42px'});el.addEventListener('mouseleave',()=>{hov=false;ring.style.width='26px';ring.style.height='26px'})});function anim(){ctx.clearRect(0,0,innerWidth,innerHeight);rp.x+=(mouse.x-rp.x)*0.15;rp.y+=(mouse.y-rp.y)*0.15;ring.style.left=rp.x+'px';ring.style.top=rp.y+'px';for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vx*=0.98;p.vy*=0.98;p.vy+=0.02;p.life-=p.dec;if(p.life<=0){particles.splice(i,1);continue}ctx.globalAlpha=p.life;ctx.fillStyle=`rgba(0,0,0,${p.life})`;if(p.t==='sq')ctx.fillRect(p.x,p.y,p.size,p.size);else{ctx.beginPath();ctx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2);ctx.fill()}}ctx.globalAlpha=1;requestAnimationFrame(anim)}anim();if('ontouchstart' in window){canvas.style.display='none';dot.style.display='none';ring.style.display='none'}
 </script>
 </body>
 </html>
