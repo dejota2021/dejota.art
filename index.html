@@ -11,21 +11,25 @@
   @media (pointer: fine){ *{cursor:none !important} a,button{cursor:none !important} }
   .no-scrollbar::-webkit-scrollbar{display:none}
   .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
-  #miniWrap{height:118px;background:#000;overflow:hidden;position:relative;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.08);touch-action:pan-y}
+  #miniWrap{height:118px;background:#000;overflow:hidden;position:relative;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.08);cursor:grab;touch-action:pan-y;user-select:none}
+  #miniWrap:active{cursor:grabbing}
   @media(max-width:768px){#miniWrap{height:102px}}
   #miniTrack{display:flex;gap:10px;will-change:transform;height:100%;align-items:center;padding:0 10px}
-  .mini-item{flex:0 0 auto;width:182px;height:98px;border-radius:14px;overflow:hidden;background:#111;cursor:pointer;border:1px solid rgba(255,255,255,.14);transition:transform .2s, border-color .2s}
-  .mini-item:hover{transform:scale(1.05);border-color:rgba(255,255,255,.45)}
+  .mini-item{flex:0 0 auto;width:182px;height:98px;border-radius:14px;overflow:hidden;background:#111;cursor:pointer;border:1px solid rgba(255,255,255,.14);transition:border-color .2s}
+  .mini-item:hover{border-color:rgba(255,255,255,.45)}
   @media(max-width:768px){.mini-item{width:152px;height:84px;border-radius:12px}}
   .mini-item img{width:100%;height:100%;object-fit:cover;pointer-events:none}
   #bigOverlay{position:fixed;inset:0;z-index:120;background:rgba(5,5,5,.96);backdrop-filter:blur(18px);display:none;flex-direction:column;opacity:0;transition:opacity .35s}
   #bigOverlay.open{display:flex;opacity:1}
-  #bigTrackWrap{flex:1;overflow:hidden;display:flex;align-items:center;position:relative;touch-action:pan-y}
+  #bigTrackWrap{flex:1;overflow:hidden;display:flex;align-items:center;position:relative;touch-action:pan-y;cursor:grab}
+  #bigTrackWrap:active{cursor:grabbing}
   #bigTrack{display:flex;gap:14px;will-change:transform;padding:0 40px}
   .big-item{flex:0 0 auto;width:78vw;max-width:900px;height:72vh;max-height:720px;border-radius:22px;overflow:hidden;background:#111;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.6)}
   @media(min-width:1024px){.big-item{width:62vw;height:78vh}}
   .big-item img{width:100%;height:100%;object-fit:cover;pointer-events:none}
   #bigClose{position:absolute;top:18px;right:18px;z-index:10;width:40px;height:40px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff}
+  /* espacio blanco pequeño */
+  .gap-white{height:14px;background:#fff;width:100%}
 </style>
 </head>
 <body class="bg-white antialiased">
@@ -39,12 +43,15 @@
   <img src="img/Shows.jpg" alt="dejota" class="w-full max-w-[1600px] mx-auto object-contain" onerror="this.src='img/shows.jpg'">
 </section>
 
-<!-- CARRETE MAS GRANDE ANTES DE VIDEO + SPOTIFY -->
+<!-- CARRETE -->
 <div class="bg-black">
   <div id="miniWrap" class="no-scrollbar">
     <div id="miniTrack"></div>
   </div>
 </div>
+
+<!-- ESPACIO BLANCO PEQUEÑO -->
+<div class="gap-white"></div>
 
 <!-- SPLIT VIDEO + SPOTIFY -->
 <section class="w-full bg-[#070708] px-3 md:px-4 py-4 md:py-6">
@@ -76,7 +83,7 @@
     <div id="bigTrack"></div>
   </div>
   <div class="px-8 pb-6 flex justify-between items-center">
-    <span class="text-white/30 text-[9px] tracking-[0.3em] uppercase">desliza / mueve el dedo para cambiar dirección • click fuera cierra</span>
+    <span class="text-white/30 text-[9px] tracking-[0.3em] uppercase">arrastra con clic o dedo para cambiar dirección • click fuera cierra</span>
     <span class="text-white/20 text-[9px] tracking-[0.2em]">ESC</span>
   </div>
 </div>
@@ -98,7 +105,10 @@ function buildTracks(){
   total.forEach((src,i)=>{
     const el=document.createElement('div'); el.className='mini-item'; el.dataset.idx=i % all.length;
     el.innerHTML=`<img src="${src}" loading="lazy" onerror="this.src=this.src.toLowerCase()">`;
-    el.addEventListener('click', ()=> openBig(i % all.length));
+    el.addEventListener('click', (e)=>{
+      // solo abrir si no hubo drag grande
+      if(Math.abs(dragDelta) < 8) openBig(i % all.length);
+    });
     miniTrack.appendChild(el);
   });
   total.forEach((src)=>{
@@ -113,9 +123,9 @@ let velMini = 0.56;
 let velBig = 0.63;
 let targetMini = 0.56;
 let targetBig = 0.63;
-let lastMouseX = 0;
 let offsetMini=0;
 let offsetBig=0;
+let dragDelta=0;
 
 function lerp(a,b,t){ return a + (b-a)*t; }
 function loop(){
@@ -137,50 +147,67 @@ function loop(){
 }
 loop();
 
-document.addEventListener('mousemove', (e)=>{
-  const dx = e.clientX - lastMouseX;
-  if(Math.abs(dx) > 1){
-    const dir = dx > 0 ? -1 : 1;
-    const intensity = Math.min(Math.abs(dx)*0.084 + 0.42, 2.24);
-    targetMini = dir * intensity;
-    if(bigOverlay.classList.contains('open')) targetBig = dir * (intensity*1.1);
-  }
-  lastMouseX = e.clientX;
-});
-miniWrap.addEventListener('mousemove', (e)=>{
-  const rect=miniWrap.getBoundingClientRect();
-  const rel = (e.clientX - rect.left)/rect.width;
-  const centered = rel - 0.5;
-  targetMini = centered * 3.15;
-  if(Math.abs(targetMini) < 0.2) targetMini = targetMini >=0 ? 0.2 : -0.2;
-});
+// --- SOLO CLIC Y TOUCH (no mousemove suelto) ---
+let isDragging=false, startX=0, lastX=0, lastVel=0;
 
-let touchStartX=0, lastTouchX=0, touchVel=0, touchActive=false;
-function handleTouchStart(e){ touchActive=true; touchStartX=e.touches[0].clientX; lastTouchX=touchStartX; touchVel=0; }
-function handleTouchMove(e){
-  if(!touchActive) return;
-  const curX=e.touches[0].clientX;
-  const dx=curX - lastTouchX;
-  touchVel = dx;
-  lastTouchX=curX;
+function onDragStart(clientX){
+  isDragging=true;
+  startX=clientX;
+  lastX=clientX;
+  lastVel=0;
+  dragDelta=0;
+  miniWrap.style.cursor='grabbing';
+}
+function onDragMove(clientX, isBig=false){
+  if(!isDragging) return;
+  const dx = clientX - lastX;
+  dragDelta += dx;
+  lastVel = dx;
+  lastX = clientX;
+  // cambia dirección según movimiento del drag
   const dir = dx > 0 ? -1 : 1;
-  const intensity = Math.min(Math.abs(dx)*0.06 + 0.35, 2.2);
-  targetMini = dir * intensity;
-  if(bigOverlay.classList.contains('open')) targetBig = dir * intensity * 1.1;
+  const intensity = Math.min(Math.abs(dx)*0.14 + 0.35, 2.2);
+  if(!isBig){
+    targetMini = dir * intensity;
+  } else {
+    targetBig = dir * intensity * 1.1;
+    targetMini = dir * intensity; // sincroniza mini también
+  }
 }
-function handleTouchEnd(){
-  touchActive=false;
-  const finalDir = touchVel > 0 ? -1 : 1;
-  const finalInt = Math.min(Math.abs(touchVel)*0.05 + 0.4, 1.8);
-  targetMini = finalDir * finalInt;
-  if(bigOverlay.classList.contains('open')) targetBig = finalDir * finalInt * 1.1;
+function onDragEnd(isBig=false){
+  if(!isDragging) return;
+  isDragging=false;
+  miniWrap.style.cursor='grab';
+  // inercia: continúa con última velocidad
+  const finalDir = lastVel > 0 ? -1 : 1;
+  const finalInt = Math.min(Math.abs(lastVel)*0.12 + 0.42, 1.9);
+  if(!isBig){
+    targetMini = finalDir * finalInt;
+  } else {
+    targetBig = finalDir * finalInt * 1.1;
+    targetMini = finalDir * finalInt;
+  }
+  setTimeout(()=> dragDelta=0, 50);
 }
-miniWrap.addEventListener('touchstart', handleTouchStart, {passive:true});
-miniWrap.addEventListener('touchmove', handleTouchMove, {passive:true});
-miniWrap.addEventListener('touchend', handleTouchEnd, {passive:true});
-bigWrap.addEventListener('touchstart', handleTouchStart, {passive:true});
-bigWrap.addEventListener('touchmove', handleTouchMove, {passive:true});
-bigWrap.addEventListener('touchend', handleTouchEnd, {passive:true});
+
+// Desktop clic-drag mini
+miniWrap.addEventListener('mousedown', e=> onDragStart(e.clientX));
+window.addEventListener('mousemove', e=> { if(isDragging && !bigOverlay.classList.contains('open')) onDragMove(e.clientX,false); });
+window.addEventListener('mouseup', ()=> { if(!bigOverlay.classList.contains('open')) onDragEnd(false); });
+
+// Desktop clic-drag big
+bigWrap.addEventListener('mousedown', e=>{ onDragStart(e.clientX); });
+window.addEventListener('mousemove', e=>{ if(isDragging && bigOverlay.classList.contains('open')) onDragMove(e.clientX,true); });
+window.addEventListener('mouseup', ()=>{ if(bigOverlay.classList.contains('open')) onDragEnd(true); });
+
+// Touch
+miniWrap.addEventListener('touchstart', e=> onDragStart(e.touches[0].clientX), {passive:true});
+miniWrap.addEventListener('touchmove', e=> onDragMove(e.touches[0].clientX,false), {passive:true});
+miniWrap.addEventListener('touchend', ()=> onDragEnd(false), {passive:true});
+
+bigWrap.addEventListener('touchstart', e=> onDragStart(e.touches[0].clientX), {passive:true});
+bigWrap.addEventListener('touchmove', e=> onDragMove(e.touches[0].clientX,true), {passive:true});
+bigWrap.addEventListener('touchend', ()=> onDragEnd(true), {passive:true});
 
 function openBig(idx){
   bigOverlay.classList.add('open');
@@ -189,7 +216,6 @@ function openBig(idx){
   const itemW = 914;
   offsetBig = idx * itemW;
   targetBig = targetMini !==0 ? targetMini*1.05 : 0.63;
-  requestAnimationFrame(()=> bigOverlay.classList.add('open'));
 }
 function closeBig(){
   bigOverlay.classList.remove('open');
@@ -197,7 +223,7 @@ function closeBig(){
 }
 document.getElementById('bigClose').onclick=closeBig;
 bigOverlay.addEventListener('click', (e)=>{ if(e.target === bigOverlay || e.target === bigWrap) closeBig(); });
-bigWrap.addEventListener('click', (e)=>{ if(!e.target.closest('.big-item')) closeBig(); });
+bigWrap.addEventListener('click', (e)=>{ if(!e.target.closest('.big-item') && Math.abs(dragDelta)<8) closeBig(); });
 document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeBig(); });
 
 const videoWrap=document.getElementById('videoWrap');
@@ -219,9 +245,9 @@ function startMusic(){
   const sp=document.getElementById('spotifyFrame');
   const base = 'https://open.spotify.com/embed/artist/5NpCde9H57MxIZqbmfkElY?utm_source=generator&theme=0';
   sp.src = base + '&autoplay=1';
-  ['click','keydown','mousemove','touchstart','scroll','wheel'].forEach(ev=> document.removeEventListener(ev, startMusic));
+  ['click','keydown','touchstart'].forEach(ev=> document.removeEventListener(ev, startMusic));
 }
-['click','keydown','mousemove','touchstart','scroll','wheel'].forEach(ev=>{
+['click','keydown','touchstart'].forEach(ev=>{
   document.addEventListener(ev, startMusic, {once:true, passive:true});
 });
 
