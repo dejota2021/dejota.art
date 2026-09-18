@@ -11,19 +11,22 @@
   @media (pointer: fine){ *{cursor:none !important} a,button{cursor:none !important} }
   .no-scrollbar::-webkit-scrollbar{display:none}
   .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
-  /* mini carrete top */
-  #miniWrap{height:56px;background:#000;overflow:hidden;position:relative;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.08)}
-  #miniTrack{display:flex;gap:6px;will-change:transform;height:100%;align-items:center;padding:0 6px}
-  .mini-item{flex:0 0 auto;width:68px;height:44px;border-radius:8px;overflow:hidden;background:#111;cursor:pointer;border:1px solid rgba(255,255,255,.12)}
-  .mini-item img{width:100%;height:100%;object-fit:cover}
+  /* mini carrete top - MAS GRANDE */
+  #miniWrap{height:96px;background:#000;overflow:hidden;position:relative;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.08);touch-action:pan-y}
+  @media(max-width:768px){#miniWrap{height:84px}}
+  #miniTrack{display:flex;gap:8px;will-change:transform;height:100%;align-items:center;padding:0 8px}
+  .mini-item{flex:0 0 auto;width:148px;height:78px;border-radius:12px;overflow:hidden;background:#111;cursor:pointer;border:1px solid rgba(255,255,255,.14);transition:transform .2s, border-color .2s}
+  .mini-item:hover{transform:scale(1.04);border-color:rgba(255,255,255,.4)}
+  @media(max-width:768px){.mini-item{width:124px;height:68px;border-radius:10px}}
+  .mini-item img{width:100%;height:100%;object-fit:cover;pointer-events:none}
   /* big overlay */
   #bigOverlay{position:fixed;inset:0;z-index:120;background:rgba(5,5,5,.96);backdrop-filter:blur(18px);display:none;flex-direction:column;opacity:0;transition:opacity .35s}
   #bigOverlay.open{display:flex;opacity:1}
-  #bigTrackWrap{flex:1;overflow:hidden;display:flex;align-items:center;position:relative}
+  #bigTrackWrap{flex:1;overflow:hidden;display:flex;align-items:center;position:relative;touch-action:pan-y}
   #bigTrack{display:flex;gap:14px;will-change:transform;padding:0 40px}
   .big-item{flex:0 0 auto;width:78vw;max-width:900px;height:72vh;max-height:720px;border-radius:22px;overflow:hidden;background:#111;position:relative;box-shadow:0 30px 80px rgba(0,0,0,.6)}
   @media(min-width:1024px){.big-item{width:62vw;height:78vh}}
-  .big-item img{width:100%;height:100%;object-fit:cover}
+  .big-item img{width:100%;height:100%;object-fit:cover;pointer-events:none}
   #bigClose{position:absolute;top:18px;right:18px;z-index:10;width:40px;height:40px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff}
 </style>
 </head>
@@ -34,9 +37,9 @@
  <span class="text-[9px] tracking-[0.25em] uppercase opacity-40">MED — 2026</span>
 </nav>
 
-<!-- MINI CARRETE AL INICIO, MUY PEQUEÑO -->
+<!-- CARRETE MAS GRANDE -->
 <div class="pt-[64px] bg-black">
-  <div id="miniWrap" class="no-scrollbar cursor-pointer">
+  <div id="miniWrap" class="no-scrollbar">
     <div id="miniTrack"></div>
   </div>
 </div>
@@ -60,7 +63,6 @@
         <div class="absolute top-3 left-3 px-3 py-1 rounded-full bg-white/10 backdrop-blur text-white text-[9px] tracking-[0.3em] border border-white/10">VIDEO</div>
       </div>
     </div>
-    <!-- SPOTIFY - SIN TEXTO AUTOPLAY -->
     <div class="relative w-full bg-[#121212] rounded-[20px] overflow-hidden p-3 flex flex-col min-h-[400px] lg:min-h-[520px]">
       <div class="flex justify-between items-center px-2 pb-3"><span class="text-white/40 text-[9px] tracking-[0.3em] uppercase">SPOTIFY / TOP TRACKS</span><span class="w-2 h-2 bg-[#1DB954] rounded-full animate-pulse"></span></div>
       <iframe id="spotifyFrame" src="https://open.spotify.com/embed/artist/5NpCde9H57MxIZqbmfkElY?utm_source=generator&theme=0" width="100%" height="100%" class="flex-1 rounded-[12px] min-h-[450px]" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="eager"></iframe>
@@ -68,7 +70,6 @@
   </div>
 </section>
 
-<!-- TITULO PEQUEÑO -->
 <section class="w-full bg-white pt-8 pb-2 px-6 md:px-10">
   <h2 class="text-[10px] tracking-[0.35em] uppercase opacity-30">archivo visual — 13 piezas</h2>
 </section>
@@ -82,7 +83,7 @@
     <div id="bigTrack"></div>
   </div>
   <div class="px-8 pb-6 flex justify-between items-center">
-    <span class="text-white/30 text-[9px] tracking-[0.3em] uppercase">mueve el mouse para cambiar dirección • click fuera cierra</span>
+    <span class="text-white/30 text-[9px] tracking-[0.3em] uppercase">desliza / mueve el dedo para cambiar dirección • click fuera cierra</span>
     <span class="text-white/20 text-[9px] tracking-[0.2em]">ESC</span>
   </div>
 </div>
@@ -100,7 +101,6 @@ const miniWrap=document.getElementById('miniWrap');
 const bigOverlay=document.getElementById('bigOverlay');
 const bigWrap=document.getElementById('bigTrackWrap');
 
-// Construir pistas duplicadas x4 para loop infinito
 function buildTracks(){
   const total = [...all, ...all, ...all, ...all];
   total.forEach((src,i)=>{
@@ -109,31 +109,28 @@ function buildTracks(){
     el.addEventListener('click', ()=> openBig(i % all.length));
     miniTrack.appendChild(el);
   });
-  total.forEach((src,i)=>{
+  total.forEach((src)=>{
     const el=document.createElement('div'); el.className='big-item group';
-    el.innerHTML=`<img src="${src}" alt="" loading="lazy" onerror="this.src=this.src.toLowerCase()"><div class="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/60 to-transparent"><span class="text-white/70 text-[9px] tracking-[0.3em]">${String((i%all.length)+1).padStart(2,'0')}</span></div>`;
+    el.innerHTML=`<img src="${src}" loading="lazy" onerror="this.src=this.src.toLowerCase()">`;
     bigTrack.appendChild(el);
   });
 }
 buildTracks();
 
-// --- LÓGICA DE MOVIMIENTO CONTINUO QUE SIGUE AL MOUSE ---
-let velMini = 0.8; // siempre en movimiento, nunca 0
-let velBig = 0.9;
-let targetMini = 0.8;
-let targetBig = 0.9;
+// VELOCIDAD REDUCIDA 30% (antes 0.8 -> ahora 0.56)
+let velMini = 0.56;
+let velBig = 0.63;
+let targetMini = 0.56;
+let targetBig = 0.63;
 let lastMouseX = 0;
-let rafId=null;
 let offsetMini=0;
 let offsetBig=0;
 
 function lerp(a,b,t){ return a + (b-a)*t; }
 
 function loop(){
-  // update offset
   offsetMini += velMini;
   offsetBig += velBig;
-  // loop infinito - reset when past half
   const halfMini = miniTrack.scrollWidth/2;
   if(offsetMini > halfMini) offsetMini -= halfMini;
   if(offsetMini < 0) offsetMini += halfMini;
@@ -144,64 +141,92 @@ function loop(){
   miniTrack.style.transform = `translateX(${-offsetMini}px)`;
   bigTrack.style.transform = `translateX(${-offsetBig}px)`;
 
-  // suavizar velocidad hacia target
-  velMini = lerp(velMini, targetMini, 0.06);
-  velBig = lerp(velBig, targetBig, 0.06);
+  velMini = lerp(velMini, targetMini, 0.045); // más suave
+  velBig = lerp(velBig, targetBig, 0.045);
 
-  // mantener mínimo movimiento, nunca 0
-  if(Math.abs(velMini) < 0.25) velMini = velMini >=0 ? 0.25 : -0.25;
-  if(Math.abs(velBig) < 0.25) velBig = velBig >=0 ? 0.25 : -0.25;
+  // mínimo nunca 0, reducido 30% también (antes 0.25 -> 0.175)
+  if(Math.abs(velMini) < 0.175) velMini = velMini >=0 ? 0.175 : -0.175;
+  if(Math.abs(velBig) < 0.175) velBig = velBig >=0 ? 0.175 : -0.175;
 
-  rafId=requestAnimationFrame(loop);
+  requestAnimationFrame(loop);
 }
 loop();
 
-// Mouse mueve dirección - detecta delta X global
+// MOUSE GLOBAL - dirección continua
 document.addEventListener('mousemove', (e)=>{
   const dx = e.clientX - lastMouseX;
   if(Math.abs(dx) > 1){
-    // si mouse va a la derecha, carrete va a la derecha (vel negativa = contenido a la derecha)
-    // invertimos para sensación natural: mover mouse derecha => carrete sigue derecha
     const dir = dx > 0 ? -1 : 1;
-    // intensidad proporcional
-    const intensity = Math.min(Math.abs(dx)*0.12 + 0.6, 3.2);
+    // intensidad reducida 30%: antes 0.12*dx+0.6 max 3.2 -> ahora 0.084*dx+0.42 max 2.24
+    const intensity = Math.min(Math.abs(dx)*0.084 + 0.42, 2.24);
     targetMini = dir * intensity;
     if(bigOverlay.classList.contains('open')){
-      targetBig = dir * (intensity*1.2);
+      targetBig = dir * (intensity*1.1);
     }
   }
   lastMouseX = e.clientX;
 });
 
-// También si el mouse está sobre el mini, velocidad según posición en el contenedor
+// Hover sobre mini: controla dirección por posición (más intuitivo)
 miniWrap.addEventListener('mousemove', (e)=>{
   const rect=miniWrap.getBoundingClientRect();
-  const rel = (e.clientX - rect.left)/rect.width; // 0-1
-  // centro 0.5 = neutro, izquierda = - , derecha = +
+  const rel = (e.clientX - rect.left)/rect.width;
   const centered = rel - 0.5;
-  targetMini = centered * 4.5; // -2.25 a 2.25
-  if(Math.abs(targetMini) < 0.3) targetMini = targetMini >=0 ? 0.3 : -0.3;
+  // reducido 30%: antes 4.5 -> 3.15
+  targetMini = centered * 3.15;
+  if(Math.abs(targetMini) < 0.2) targetMini = targetMini >=0 ? 0.2 : -0.2;
 });
 
-// touch drag cambia dirección también
-let touchStartX=0;
-miniWrap.addEventListener('touchstart', e=>{ touchStartX=e.touches[0].clientX }, {passive:true});
-miniWrap.addEventListener('touchmove', e=>{
-  const dx=e.touches[0].clientX - touchStartX;
-  targetMini = (dx>0? -1:1) * Math.min(Math.abs(dx)*0.02+0.5, 3);
-}, {passive:true});
+// TOUCH CELULAR - inercia que continúa
+let touchStartX=0, lastTouchX=0, touchVel=0, touchRaf=null;
+let touchActive=false;
+
+function handleTouchStart(e){
+  touchActive=true;
+  touchStartX=e.touches[0].clientX;
+  lastTouchX=touchStartX;
+  touchVel=0;
+}
+function handleTouchMove(e){
+  if(!touchActive) return;
+  const curX=e.touches[0].clientX;
+  const dx=curX - lastTouchX;
+  touchVel = dx; // velocidad instantánea
+  lastTouchX=curX;
+  // dirección invertida para carrete
+  const dir = dx > 0 ? -1 : 1;
+  const intensity = Math.min(Math.abs(dx)*0.06 + 0.35, 2.2);
+  targetMini = dir * intensity;
+  if(bigOverlay.classList.contains('open')){
+    targetBig = dir * intensity * 1.1;
+  }
+}
+function handleTouchEnd(){
+  touchActive=false;
+  // la velocidad target se mantiene con la última inercia, no se resetea a 0 -> continúa
+  // dejamos que siga con la última dirección calculada
+  const finalDir = touchVel > 0 ? -1 : 1;
+  const finalInt = Math.min(Math.abs(touchVel)*0.05 + 0.4, 1.8);
+  targetMini = finalDir * finalInt;
+  if(bigOverlay.classList.contains('open')) targetBig = finalDir * finalInt * 1.1;
+}
+
+miniWrap.addEventListener('touchstart', handleTouchStart, {passive:true});
+miniWrap.addEventListener('touchmove', handleTouchMove, {passive:true});
+miniWrap.addEventListener('touchend', handleTouchEnd, {passive:true});
+
+bigWrap.addEventListener('touchstart', handleTouchStart, {passive:true});
+bigWrap.addEventListener('touchmove', handleTouchMove, {passive:true});
+bigWrap.addEventListener('touchend', handleTouchEnd, {passive:true});
 
 // Abrir grande
 function openBig(idx){
   bigOverlay.classList.add('open');
   bigOverlay.style.display='flex';
   document.body.style.overflow='hidden';
-  // posicionar cerca del idx
-  const itemW = 900 + 14; // aprox
+  const itemW = 914; // 900+14
   offsetBig = idx * itemW;
-  // fuerza dirección actual
-  targetBig = targetMini !==0 ? targetMini*1.2 : 0.9;
-  // animar entrada
+  targetBig = targetMini !==0 ? targetMini*1.05 : 0.63;
   requestAnimationFrame(()=> bigOverlay.classList.add('open'));
 }
 function closeBig(){
@@ -209,16 +234,8 @@ function closeBig(){
   setTimeout(()=>{ bigOverlay.style.display='none'; document.body.style.overflow=''; }, 300);
 }
 document.getElementById('bigClose').onclick=closeBig;
-// click fuera de imagen cierra
-bigOverlay.addEventListener('click', (e)=>{
-  if(e.target === bigOverlay || e.target === bigWrap){
-    closeBig();
-  }
-});
-bigWrap.addEventListener('click', (e)=>{
-  // si clickea el fondo vacío, no en .big-item
-  if(!e.target.closest('.big-item')) closeBig();
-});
+bigOverlay.addEventListener('click', (e)=>{ if(e.target === bigOverlay || e.target === bigWrap) closeBig(); });
+bigWrap.addEventListener('click', (e)=>{ if(!e.target.closest('.big-item')) closeBig(); });
 document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeBig(); });
 
 // VIDEO
@@ -234,16 +251,14 @@ if(videoWrap){
   }, { once: true });
 }
 
-// SPOTIFY - suena al interactuar con la pagina
+// SPOTIFY autoplay al interactuar
 let musicStarted=false;
 function startMusic(){
   if(musicStarted) return;
   musicStarted=true;
   const sp=document.getElementById('spotifyFrame');
-  // reload con autoplay param pero sin mostrar texto
   const base = 'https://open.spotify.com/embed/artist/5NpCde9H57MxIZqbmfkElY?utm_source=generator&theme=0';
   sp.src = base + '&autoplay=1';
-  // limpiar listeners
   ['click','keydown','mousemove','touchstart','scroll','wheel'].forEach(ev=> document.removeEventListener(ev, startMusic));
 }
 ['click','keydown','mousemove','touchstart','scroll','wheel'].forEach(ev=>{
