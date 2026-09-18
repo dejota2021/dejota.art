@@ -1,27 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
-<head><style>
-@font-face {
-  font-family: "Optimistic";
-  font-style: normal;
-  font-weight: 400 600;
-  font-display: swap;
-  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
-}
-@font-face {
-  font-family: "Optimistic Mono";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
-}
-:where(html) {
-  font-family: "Optimistic", system-ui, sans-serif;
-}
-:where(code, pre, kbd, samp) {
-  font-family: "Optimistic Mono", ui-monospace, monospace;
-}
-</style>
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>dejota</title>
@@ -30,12 +9,23 @@
 <style>
   body{background:#fff;color:#000}
   @media (pointer: fine){ *{cursor:none !important} a,button{cursor:none !important} }
+  /* CARRETE */
+  .marquee-wrapper{overflow:hidden;position:relative}
+  .marquee-track{display:flex;gap:12px;width:max-content;animation: scroll 80s linear infinite;}
+  .marquee-wrapper:hover .marquee-track{animation-play-state:paused}
+  @keyframes scroll{from{transform:translateX(0)} to{transform:translateX(-50%)}}
+  .marquee-item{flex:0 0 auto;width:320px;height:420px;border-radius:20px;overflow:hidden;background:#111;position:relative}
+  @media(min-width:768px){.marquee-item{width:380px;height:480px}}
+  .marquee-item img{width:100%;height:100%;object-fit:cover;transition:transform .8s}
+  .marquee-item:hover img{transform:scale(1.08)}
+  .no-scrollbar::-webkit-scrollbar{display:none}
+  .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}
 </style>
 </head>
 <body class="bg-white antialiased">
 <nav class="fixed top-0 w-full z-40 flex justify-between items-center px-6 md:px-10 py-5 bg-white/70 backdrop-blur-xl border-b border-black/5">
  <span class="font-bold tracking-[0.2em] text-[12px]">DEJOTA®</span>
- <button id="openG" class="text-[11px] tracking-[0.25em] uppercase px-5 py-2 rounded-full border border-black/15 hover:bg-black/5">GALERÍA</button>
+ <a href="#carrete" class="text-[11px] tracking-[0.25em] uppercase px-5 py-2 rounded-full border border-black/15 hover:bg-black/5">CARRETE</a>
 </nav>
 
 <section class="relative w-full min-h-[70vh] bg-white flex items-center justify-center pt-20">
@@ -45,7 +35,7 @@
 <!-- SPLIT VIDEO + SPOTIFY -->
 <section class="w-full bg-[#070708] px-3 md:px-4 py-4 md:py-6">
   <div class="max-w-[1700px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-4 items-stretch">
-    <!-- VIDEO IZQ - CLICK TO PLAY PARA QUE CUENTE COMO VIEW -->
+    <!-- VIDEO IZQ -->
     <div id="videoWrap" class="relative w-full bg-black rounded-[20px] overflow-hidden aspect-video lg:aspect-[16/9.5] group cursor-pointer">
       <div id="videoFacade" class="absolute inset-0 w-full h-full">
         <img src="https://img.youtube.com/vi/vFhUfgFUBVk/maxresdefault.jpg" alt="Dejota Video" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-500">
@@ -59,46 +49,115 @@
         <div class="absolute bottom-3 right-3 px-3 py-1 rounded-full bg-black/60 backdrop-blur text-white text-[8px] tracking-[0.2em]">CLICK PARA REPRODUCIR — SUMA VIEW</div>
       </div>
     </div>
-    <!-- SPOTIFY DER -->
+    <!-- SPOTIFY DER - AUTOPLAY -->
     <div class="relative w-full bg-[#121212] rounded-[20px] overflow-hidden p-3 flex flex-col min-h-[400px] lg:min-h-[520px]">
-      <div class="flex justify-between items-center px-2 pb-3"><span class="text-white/50 text-[10px] tracking-[0.3em] uppercase">SPOTIFY / TOP TRACKS</span><span class="w-2 h-2 bg-[#1DB954] rounded-full animate-pulse"></span></div>
-      <iframe src="https://open.spotify.com/embed/artist/5NpCde9H57MxIZqbmfkElY?utm_source=generator&theme=0" width="100%" height="100%" class="flex-1 rounded-[12px] min-h-[450px]" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+      <div class="flex justify-between items-center px-2 pb-3"><span class="text-white/50 text-[10px] tracking-[0.3em] uppercase">SPOTIFY / TOP TRACKS • AUTOPLAY</span><span class="w-2 h-2 bg-[#1DB954] rounded-full animate-pulse"></span></div>
+      <iframe id="spotifyFrame" src="https://open.spotify.com/embed/artist/5NpCde9H57MxIZqbmfkElY?utm_source=generator&theme=0&autoplay=1" width="100%" height="100%" class="flex-1 rounded-[12px] min-h-[450px]" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="eager"></iframe>
+      <p class="text-white/30 text-[8px] mt-2 px-2 tracking-widest uppercase">* El navegador puede bloquear el autoplay hasta que interactúes. Se intenta reproducir automáticamente al cargar.</p>
     </div>
   </div>
 </section>
 
-<div id="gal" class="fixed inset-0 z-[100] bg-[#050505] translate-y-full transition-transform duration-[600ms] overflow-y-auto">
-  <div class="sticky top-0 flex justify-between items-center px-6 md:px-10 py-5 bg-[#050505]/90 backdrop-blur-xl border-b border-white/10"><span class="text-white text-[12px] tracking-[0.3em]">GALERÍA</span><button id="closeG" class="w-10 h-10 rounded-full border border-white/20 bg-white/5 text-white">✕</button></div>
-  <div id="grid" class="px-3 md:px-6 py-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"></div>
-</div>
+<!-- NUEVO CARRETE MOVIBLE AL FINAL -->
+<section id="carrete" class="w-full bg-white pt-16 pb-4">
+  <div class="px-6 md:px-10 flex justify-between items-end mb-6">
+    <div>
+      <h2 class="text-[22px] md:text-[32px] font-bold tracking-tight leading-none">CARRETE / ARCHIVO VISUAL</h2>
+      <p class="text-[10px] tracking-[0.3em] uppercase opacity-40 mt-2">Desliza, arrastra o deja que corra solo • 13 piezas</p>
+    </div>
+    <div class="hidden md:flex gap-2">
+      <button id="prevBtn" class="w-10 h-10 rounded-full border border-black/15 hover:bg-black hover:text-white transition flex items-center justify-center">←</button>
+      <button id="nextBtn" class="w-10 h-10 rounded-full border border-black/15 hover:bg-black hover:text-white transition flex items-center justify-center">→</button>
+    </div>
+  </div>
 
-<footer class="px-6 md:px-10 py-10 flex justify-between text-[10px] tracking-[0.2em] uppercase opacity-40 border-t border-black/5 bg-white"><span>© 2026 dejota.art</span><a href="https://instagram.com/dejota2021">IG: @dejota2021</a></footer>
+  <div id="marqueeWrap" class="marquee-wrapper no-scrollbar cursor-grab active:cursor-grabbing select-none">
+    <div id="marqueeTrack" class="marquee-track px-3"></div>
+  </div>
+
+  <!-- Mobile drag scroll bar hint -->
+  <div class="px-6 md:px-10 mt-6 flex justify-between items-center opacity-30">
+    <span class="text-[9px] tracking-[0.3em]">ARRASTRA PARA EXPLORAR</span>
+    <div class="h-[1px] w-20 bg-black"></div>
+  </div>
+</section>
+
+<footer class="px-6 md:px-10 py-10 flex justify-between text-[10px] tracking-[0.2em] uppercase opacity-40 border-t border-black/5 bg-white mt-8"><span>© 2026 dejota.art</span><a href="https://instagram.com/dejota2021">IG: @dejota2021</a></footer>
 
 <canvas id="pc" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9998;"></canvas>
 <div id="dot" style="position:fixed;width:5px;height:5px;background:#000;border-radius:50%;pointer-events:none;z-index:9999;mix-blend-mode:difference;transform:translate(-50%,-50%)"></div>
 <div id="ring" style="position:fixed;width:26px;height:26px;border:1px solid rgba(0,0,0,.25);border-radius:50%;pointer-events:none;z-index:9999;mix-blend-mode:difference;transform:translate(-50%,-50%);transition:.2s"></div>
 
 <script>
+// IMAGENES
 const all=["img/distribucion_5.jpg","img/distribucion_4.jpg","img/distribucion_3.jpg","img/distribucion_2.jpg","img/distribucion_1.jpg","img/DSCF7539.jpg","img/DSCF7551.jpg","img/DSCF7560.jpg","img/DSCF7574.jpg","img/DSCF6944.jpg","img/DSCF6946.jpg","img/DSCF6959.jpg","img/DSCF6919.jpg"];
-const grid=document.getElementById('grid');
-all.forEach(s=>{const w=document.createElement('div');w.className='rounded-[18px] aspect-[4/5] overflow-hidden bg-[#111] group';const i=document.createElement('img');i.loading='lazy';i.className='w-full h-full object-cover group-hover:scale-[1.03] transition duration-700';i.src=s;i.onerror=function(){this.src=s.toLowerCase()};w.appendChild(i);grid.appendChild(w);});
-const canvas=document.getElementById('pc'),ctx=canvas.getContext('2d'),dot=document.getElementById('dot'),ring=document.getElementById('ring');let particles=[],mouse={x:-100,y:-100},rp={x:-100,y:-100},hov=false,gOpen=false;function rs(){const d=window.devicePixelRatio||1;canvas.width=innerWidth*d;canvas.height=innerHeight*d;canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';ctx.setTransform(d,0,0,d,0,0);}rs();addEventListener('resize',rs);const gal=document.getElementById('gal');addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px';for(let k=0;k<(hov?4:2);k++)particles.push({x:e.clientX+(Math.random()-0.5)*6,y:e.clientY+(Math.random()-0.5)*6,vx:(Math.random()-0.5)*1.2,vy:(Math.random()-0.5)*1.2,size:Math.random()*1.8+0.3,life:1,dec:0.018+Math.random()*0.03,t:Math.random()>0.85?'sq':'d'})});document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>{hov=true;ring.style.width='42px';ring.style.height='42px'});el.addEventListener('mouseleave',()=>{hov=false;ring.style.width='26px';ring.style.height='26px'})});function anim(){ctx.clearRect(0,0,innerWidth,innerHeight);rp.x+=(mouse.x-rp.x)*0.15;rp.y+=(mouse.y-rp.y)*0.15;ring.style.left=rp.x+'px';ring.style.top=rp.y+'px';for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vx*=0.98;p.vy*=0.98;p.vy+=0.02;p.life-=p.dec;if(p.life<=0){particles.splice(i,1);continue}ctx.globalAlpha=p.life;const b=gOpen?255:0;ctx.fillStyle=`rgba(${b},${b},${b},${p.life})`;if(p.t==='sq')ctx.fillRect(p.x,p.y,p.size,p.size);else{ctx.beginPath();ctx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2);ctx.fill()}}ctx.globalAlpha=1;requestAnimationFrame(anim)}anim();if('ontouchstart' in window) {canvas.style.display='none';dot.style.display='none';ring.style.display='none'}document.getElementById('openG').onclick=()=>{gal.style.transform='translateY(0)';document.body.style.overflow='hidden';gOpen=true};document.getElementById('closeG').onclick=()=>{gal.style.transform='translateY(100%)';document.body.style.overflow='';gOpen=false};
 
-// VIDEO LOGIC - carga solo con click para que cuente como view
-const videoWrap = document.getElementById('videoWrap');
-const videoFacade = document.getElementById('videoFacade');
+// CARRETE INFINITO
+const track=document.getElementById('marqueeTrack');
+function createItem(src, index){
+  const d=document.createElement('div');
+  d.className='marquee-item group';
+  d.innerHTML=`<img src="${src}" alt="dejota ${index}" loading="lazy" onerror="this.src=this.src.toLowerCase()"><div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition"><span class="text-white text-[9px] tracking-[0.3em]">${String(index+1).padStart(2,'0')} / ${all.length}</span></div>`;
+  return d;
+}
+// Duplicamos para efecto infinito
+[...all, ...all].forEach((s,i)=> track.appendChild(createItem(s, i % all.length)));
+
+// Drag to scroll
+const wrap=document.getElementById('marqueeWrap');
+let isDown=false,startX,scrollLeft,pausedByDrag=false;
+wrap.addEventListener('mousedown', (e)=>{
+  isDown=true; pausedByDrag=true; track.style.animationPlayState='paused';
+  wrap.classList.add('cursor-grabbing'); startX=e.pageX - wrap.offsetLeft; scrollLeft=wrap.scrollLeft;
+});
+wrap.addEventListener('mouseleave', ()=>{ isDown=false; if(pausedByDrag){track.style.animationPlayState='running';} });
+wrap.addEventListener('mouseup', ()=>{ isDown=false; setTimeout(()=>{ if(!isDown) track.style.animationPlayState='running'; }, 800); });
+wrap.addEventListener('mousemove', (e)=>{
+  if(!isDown) return; e.preventDefault(); const x=e.pageX - wrap.offsetLeft; const walk=(x-startX)*1.5; wrap.scrollLeft=scrollLeft-walk;
+});
+// Touch
+wrap.addEventListener('touchstart', ()=>{ track.style.animationPlayState='paused'; }, {passive:true});
+wrap.addEventListener('touchend', ()=>{ setTimeout(()=> track.style.animationPlayState='running', 1000); }, {passive:true});
+
+document.getElementById('prevBtn').onclick=()=> wrap.scrollBy({left:-400, behavior:'smooth'});
+document.getElementById('nextBtn').onclick=()=> wrap.scrollBy({left:400, behavior:'smooth'});
+
+// CURSOR PARTICULAS (sin galeria)
+const canvas=document.getElementById('pc'),ctx=canvas.getContext('2d'),dot=document.getElementById('dot'),ring=document.getElementById('ring');let particles=[],mouse={x:-100,y:-100},rp={x:-100,y:-100},hov=false;
+function rs(){const d=window.devicePixelRatio||1;canvas.width=innerWidth*d;canvas.height=innerHeight*d;canvas.style.width=innerWidth+'px';canvas.style.height=innerHeight+'px';ctx.setTransform(d,0,0,d,0,0);}rs();addEventListener('resize',rs);
+addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px';for(let k=0;k<(hov?4:2);k++)particles.push({x:e.clientX+(Math.random()-0.5)*6,y:e.clientY+(Math.random()-0.5)*6,vx:(Math.random()-0.5)*1.2,vy:(Math.random()-0.5)*1.2,size:Math.random()*1.8+0.3,life:1,dec:0.018+Math.random()*0.03,t:Math.random()>0.85?'sq':'d'})});
+document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>{hov=true;ring.style.width='42px';ring.style.height='42px'});el.addEventListener('mouseleave',()=>{hov=false;ring.style.width='26px';ring.style.height='26px'})});
+function anim(){ctx.clearRect(0,0,innerWidth,innerHeight);rp.x+=(mouse.x-rp.x)*0.15;rp.y+=(mouse.y-rp.y)*0.15;ring.style.left=rp.x+'px';ring.style.top=rp.y+'px';for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vx*=0.98;p.vy*=0.98;p.vy+=0.02;p.life-=p.dec;if(p.life<=0){particles.splice(i,1);continue}ctx.globalAlpha=p.life;ctx.fillStyle=`rgba(0,0,0,${p.life})`;if(p.t==='sq')ctx.fillRect(p.x,p.y,p.size,p.size);else{ctx.beginPath();ctx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2);ctx.fill()}}ctx.globalAlpha=1;requestAnimationFrame(anim)}anim();
+if('ontouchstart' in window) {canvas.style.display='none';dot.style.display='none';ring.style.display='none'}
+
+// VIDEO LOGIC
+const videoWrap=document.getElementById('videoWrap');
 videoWrap.addEventListener('click', () => {
-  const iframe = document.createElement('iframe');
-  iframe.className = 'w-full h-full absolute inset-0';
-  iframe.src = 'https://www.youtube.com/embed/vFhUfgFUBVk?autoplay=1&rel=0&modestbranding=1&controls=1&playsinline=1';
-  iframe.title = 'Dejota Video';
-  iframe.frameBorder = '0';
-  iframe.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
-  iframe.allowFullscreen = true;
-  videoWrap.innerHTML = '';
-  videoWrap.appendChild(iframe);
+  const iframe=document.createElement('iframe');
+  iframe.className='w-full h-full absolute inset-0';
+  iframe.src='https://www.youtube.com/embed/vFhUfgFUBVk?autoplay=1&rel=0&modestbranding=1&controls=1&playsinline=1';
+  iframe.title='Dejota Video';
+  iframe.frameBorder='0';
+  iframe.allow='autoplay; encrypted-media; fullscreen; picture-in-picture';
+  iframe.allowFullscreen=true;
+  videoWrap.innerHTML=''; videoWrap.appendChild(iframe);
 }, { once: true });
 
+// SPOTIFY AUTOPLAY - intento
+window.addEventListener('load', ()=>{
+  const sp=document.getElementById('spotifyFrame');
+  // Intento de autoplay via mute interaction - Spotify lo bloquea pero dejamos el param
+  // Truco: si el usuario hace primer click en cualquier lado, recargamos con autoplay
+  let tried=false;
+  const tryPlay=()=>{
+    if(tried) return; tried=true;
+    sp.src=sp.src; // reload para gatillar autoplay con gesto
+    document.removeEventListener('click', tryPlay);
+    document.removeEventListener('keydown', tryPlay);
+  };
+  document.addEventListener('click', tryPlay, {once:true});
+  document.addEventListener('keydown', tryPlay, {once:true});
+});
 </script>
-<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
+</body>
 </html>
